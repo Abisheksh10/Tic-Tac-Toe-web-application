@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      background-color: #282c34;
+      color: #61dafb;
+    }
+
+    #board-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      background-color: #61dafb;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 5px;
+      background-color: #fff;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      border: 2px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .cell:hover {
+      background-color: #f0f0f0;
+    }
+
+    .x-mark {
+      color: #ff6b81;
+    }
+
+    .o-mark {
+      color: #74b9ff;
+    }
+
+    #result {
+      font-size: 24px;
+      text-align: center;
+      margin-top: 20px;
+      color: #fff;
+    }
+
+    #result span {
+      font-weight: bold;
+    }
+
+    #reset-button {
+      display: none;
+      background-color: #61dafb;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 20px;
+    }
+
+    #reset-button:hover {
+      background-color: #4fa3d1;
+    }
+  </style>
+  <title>Tic-Tac-Toe</title>
+</head>
+<body>
+  <div id="board-container">
+    <div id="board"></div>
+  </div>
+  <div id="result"></div>
+  <button id="reset-button" onclick="resetGame()">Reset Game</button>
+  <script>
+    // Initialize the game board
+    const board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let gameOver = false;
+
+    // Create the game board elements
+    const boardElement = document.getElementById('board');
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.dataset.index = i;
+      cell.addEventListener('click', handleCellClick);
+      boardElement.appendChild(cell);
+    }
+
+    // Handle cell click
+    function handleCellClick(event) {
+      if (gameOver) return;
+
+      const index = event.target.dataset.index;
+      if (board[index] === '') {
+        board[index] = currentPlayer;
+        event.target.innerHTML = `<span class="${currentPlayer.toLowerCase()}-mark">${currentPlayer}</span>`;
+        
+        if (checkWinner()) {
+          document.getElementById('result').innerHTML = `Player <span>${currentPlayer}</span> wins!`;
+          gameOver = true;
+          showResetButton();
+        } else if (board.every(cell => cell !== '')) {
+          document.getElementById('result').innerHTML = 'It\'s a draw!';
+          gameOver = true;
+          showResetButton();
+        } else {
+          currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        }
+      }
+    }
+
+    // Check for a winner
+    function checkWinner() {
+      const winPatterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6]              // Diagonals
+      ];
+
+      for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (board[a] !== '' && board[a] === board[b] && board[a] === board[c]) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    // Show the reset button
+    function showResetButton() {
+      document.getElementById('reset-button').style.display = 'block';
+    }
+
+    // Reset the game
+    function resetGame() {
+      for (let i = 0; i < 9; i++) {
+        board[i] = '';
+        document.getElementById('board').children[i].innerHTML = '';
+      }
+      
+      document.getElementById('result').textContent = '';
+      currentPlayer = 'X';
+      gameOver = false;
+      document.getElementById('reset-button').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
